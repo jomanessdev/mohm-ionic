@@ -1,0 +1,8 @@
+{
+  "name": "mohm",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular",
+  "pro_id": "a81d864a"
+}
