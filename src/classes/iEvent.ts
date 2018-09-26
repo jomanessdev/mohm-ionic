@@ -1,4 +1,6 @@
 export abstract class iEvent{
+
+    private id?: string;
     private title: string;
     private date: string;
     private description: string;
@@ -27,6 +29,14 @@ export abstract class iEvent{
      */
 	public get $description(): string {
 		return this.description;
+  }
+
+  /**
+     * Getter $id
+     * @return {string}
+     */
+	public get $id(): string {
+		return this.id;
 	}
 
     /**
@@ -51,6 +61,14 @@ export abstract class iEvent{
      */
 	public set $description(value: string) {
 		this.description = value;
+  }
+
+  /**
+     * Setter $id
+     * @param {string} value
+     */
+	public set $id(value: string) {
+		this.id = value;
 	}
 
 }

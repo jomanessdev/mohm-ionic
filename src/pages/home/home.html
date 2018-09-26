@@ -5,14 +5,18 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-card *ngFor="let mEvent of mohmEvents">
-    <img *ngIf="mEvent.imgSource; else noImageSource" [src]="mEvent.imgSource" />
+  <ion-card *ngFor="let mEvent of mohmEvents | async">
+    <img *ngIf="mEvent.$imgSource; else noImageSource" [src]="mEvent.$imgSource" />
     <ng-template #noImageSource><img src="assets/imgs/logo.png" /></ng-template>
     <ion-card-content>
-      <ion-card-title>{{ mEvent.title }}</ion-card-title>
-      <h3>{{ mEvent.date }}</h3>
-      <p>{{ mEvent.description }}</p>
-      <p>RSVP Required? <b>{{ mEvent.rsvpRequired }}</b></p>
+      <ion-card-title>{{ mEvent.$title }}</ion-card-title>
+      <h3>{{ mEvent.$date }}</h3>
+      <p>{{ mEvent.$description }}</p>
+      <p>{{ mEvent.$location }}</p>
     </ion-card-content>
+    <ion-item>
+      <ion-label>Attending?</ion-label>
+      <ion-toggle [(ngModel)]="mEvent.$isGoing" (ionChange)="attendanceChanged(mEvent)" color="secondary"></ion-toggle>
+    </ion-item>
   </ion-card>
 </ion-content>

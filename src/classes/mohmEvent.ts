@@ -4,9 +4,12 @@ import { iEvent } from './iEvent';
 export class MohmEvent extends iEvent{
     private rsvpRequired: boolean;
     private imgSource: string;
-    
+    private isGoing: boolean;
+    private location: string;
+
     constructor(){
         super();
+        this.isGoing = false;
     }
 
     /**
@@ -23,6 +26,22 @@ export class MohmEvent extends iEvent{
      */
 	public get $imgSource(): string {
 		return this.imgSource;
+    }
+
+     /**
+     * Getter $isGoing
+     * @return {boolean}
+     */
+	public get $isGoing(): boolean {
+		return this.isGoing;
+  }
+
+  /**
+     * Getter $location
+     * @return {string}
+     */
+	public get $location(): string {
+		return this.location;
 	}
 
     /**
@@ -39,6 +58,21 @@ export class MohmEvent extends iEvent{
      */
 	public set $imgSource(value: string) {
 		this.imgSource = value;
-	}
+    }
 
+    /**
+     * Setter $isGoing
+     * @param {boolean} value
+     */
+	public set $isGoing(value: boolean) {
+		this.isGoing = value;
+    }
+
+    /**
+     * Setter $location
+     * @param {string} value
+     */
+	public set $location(value: string) {
+		this.location = value;
+    }
 }
