@@ -1,32 +1,33 @@
 // Angular
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 // Ionic
 import { NavController, ToastController, LoadingController, Loading } from 'ionic-angular';
 
-// import { MohmEvent } from '../../classes/mohmEvent';
+// Classes
 import ConfigClasses from '../../classes/configClasses';
 
 // Firebase
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 // Rxjs
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 // Classes
 import { MohmEvent } from '../../classes/mohmEvent';
-// export interface MohmEvent {  date: string; description: string; rsvpRequired: boolean; title: string; isGoing: boolean; imgSource: string; location: string; }
+import { ISubscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage implements OnInit{
+export class HomePage implements OnInit, OnDestroy{
 
   mohmEventsCollection: AngularFirestoreCollection<MohmEvent>;
 
-  mohmEvents: Observable<MohmEvent[]>;
+  mohmEvents: MohmEvent[];
 
   mohmEventDoc: any;
 
@@ -36,46 +37,55 @@ export class HomePage implements OnInit{
 
   loading: Loading;
 
-  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private loadingCtrl: LoadingController, private firestore: AngularFirestore) {}
+  mohmEventsSubscription: ISubscription;
+
+  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private loadingCtrl: LoadingController, private fireDB: AngularFirestore, private fireStorage: AngularFireStorage) {}
   ngOnInit(){
     this.startLoading();
-    this.firestore.collection<MohmEvent>('mohmEvent').snapshotChanges().pipe(
-      map(
-        results => {
-          return results.map(a => {
-            let _mEvent: MohmEvent = new MohmEvent();
-            _mEvent.$date = a.payload.doc.data().date;
-            _mEvent.$location = a.payload.doc.data().location;
-            _mEvent.$title = a.payload.doc.data().title;
-            _mEvent.$description = a.payload.doc.data().description;
-            _mEvent.$imgSource = a.payload.doc.data().imgSource;
-            _mEvent.$isGoing = a.payload.doc.data().isGoing;
-            _mEvent.$rsvpRequired = a.payload.doc.data().rsvpRequired;
-            _mEvent.$id = a.payload.doc.id;
-            return _mEvent;
-          })
-        }
+    
+    this.mohmEventsSubscription = this.fireDB.collection<any>('mohmEvent').snapshotChanges().pipe(
+        map(
+          results => {
+            return results.map(a => {
+              let _mEvent: MohmEvent = new MohmEvent();
+              _mEvent.$date = a.payload.doc.data().date;
+              _mEvent.$location = a.payload.doc.data().location;
+              _mEvent.$title = a.payload.doc.data().title;
+              _mEvent.$description = a.payload.doc.data().description;
+              _mEvent.$imgSource = a.payload.doc.data().imgSource;
+              _mEvent.$isGoing = a.payload.doc.data().isGoing;
+              _mEvent.$rsvpRequired = a.payload.doc.data().rsvpRequired;
+              _mEvent.$id = a.payload.doc.id;
+              return _mEvent;
+            })
+          }
+        )
       )
-    ).subscribe((_mohmEvents) => {
-      this.stopLoading();
-      this.mohmEvents = of(_mohmEvents);
-      console.log(_mohmEvents);
-    }, error => { this.stopLoading(); console.log('[HomeComp] error', error) });
+      .subscribe((_mohmEvents) => {
+        this.mohmEvents = _mohmEvents;
+        this.stopLoading();
+      }, error => { this.stopLoading(); console.log('[HomeComp] error', error) });
+  }
+
+  ngOnDestroy(){
+    if(!this.mohmEventsSubscription.closed){
+      this.mohmEventsSubscription.unsubscribe();
+    }
   }
 
   attendanceChanged(mEvent: MohmEvent){
-    let _text = mEvent.$isGoing ? 'Going to' : 'Not going to';
+    let _text = mEvent.$isGoing ? `Going to` : `Not going to`;
+    _text += ` ${mEvent.$title}`;
 
-    this.mohmEventDoc = this.firestore.doc<MohmEvent>(`mohmEvent/${mEvent.$id}`);
-    this.mohmEventDoc.update(mEvent.$isGoing).subscribe((result) => {
-      let attendanceToast = this.toastCtrl.create(this.config.createToastConfig(`${_text} ${mEvent.$title}`));
-      attendanceToast.present();
-    }, (error) => {
-      let attendanceToast = this.toastCtrl.create(this.config.createToastConfig(`Unable to update`));
-      attendanceToast.present();
-      console.log('[HomeComp] error', error);
-    });
+    const localMohmDoc = {
+      isGoing: mEvent.$isGoing,
+    }
 
+    this.mohmEventDoc = this.fireDB.doc<MohmEvent>(`mohmEvent/${mEvent.$id}`);
+
+    this.mohmEventDoc.update(localMohmDoc);
+    let attendanceToast = this.toastCtrl.create(this.config.createToastConfig(`${_text}`));
+    attendanceToast.present();
   }
 
   startLoading(){
@@ -87,6 +97,11 @@ export class HomePage implements OnInit{
     if(this.loading){
       this.loading.dismiss();
     }
+  }
+
+  picUrl(_name: string): Observable<any>{
+    const ref = this.fireStorage.ref(_name);
+    return ref.getDownloadURL();
   }
 
 }

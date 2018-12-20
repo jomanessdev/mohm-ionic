@@ -19,6 +19,9 @@ import { TabsPage } from '../pages/tabs/tabs';
 // Firebase
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/storage';
+
 
 // Environment
 import { firebaseConfig } from '../environment';
@@ -36,6 +39,7 @@ import { firebaseConfig } from '../environment';
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
+    AngularFireStorageModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -48,6 +52,7 @@ import { firebaseConfig } from '../environment';
   providers: [
     StatusBar,
     SplashScreen,
+    AngularFireStorage,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

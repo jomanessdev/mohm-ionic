@@ -3,11 +3,9 @@
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
-
 <ion-content padding>
-  <ion-card *ngFor="let mEvent of mohmEvents | async">
-    <img *ngIf="mEvent.$imgSource; else noImageSource" [src]="mEvent.$imgSource" />
-    <ng-template #noImageSource><img src="assets/imgs/logo.png" /></ng-template>
+  <ion-card *ngFor="let mEvent of mohmEvents">
+    <img [src]="mEvent.$imgSource" />
     <ion-card-content>
       <ion-card-title>{{ mEvent.$title }}</ion-card-title>
       <h3>{{ mEvent.$date }}</h3>
