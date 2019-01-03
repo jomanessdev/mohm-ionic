@@ -16,5 +16,8 @@
       <ion-label>Attending?</ion-label>
       <ion-toggle [(ngModel)]="mEvent.$isGoing" (ionChange)="attendanceChanged(mEvent)" color="secondary"></ion-toggle>
     </ion-item>
+    <ion-item>
+      <button ion-button icon-start [disabled]="!mEvent.$isGoing" (click)="addToCalendar(mEvent)"><ion-icon name="calendar"></ion-icon>Add</button>
+    </ion-item>
   </ion-card>
 </ion-content>

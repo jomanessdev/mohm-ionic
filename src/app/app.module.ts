@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Calendar } from '@ionic-native/calendar';
 
 // Components
 import { MyApp } from './app.component';
@@ -39,7 +40,7 @@ import { firebaseConfig } from '../environment';
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
-    AngularFireStorageModule
+    AngularFireStorageModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -52,6 +53,7 @@ import { firebaseConfig } from '../environment';
   providers: [
     StatusBar,
     SplashScreen,
+    Calendar,
     AngularFireStorage,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]

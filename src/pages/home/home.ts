@@ -2,7 +2,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 // Ionic
-import { NavController, ToastController, LoadingController, Loading } from 'ionic-angular';
+import { NavController, ToastController, LoadingController, Loading, AlertController } from 'ionic-angular';
+import { Calendar } from '@ionic-native/calendar';
+
 
 // Classes
 import ConfigClasses from '../../classes/configClasses';
@@ -18,6 +20,7 @@ import { map } from 'rxjs/operators';
 // Classes
 import { MohmEvent } from '../../classes/mohmEvent';
 import { ISubscription } from 'rxjs/Subscription';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'page-home',
@@ -39,7 +42,7 @@ export class HomePage implements OnInit, OnDestroy{
 
   mohmEventsSubscription: ISubscription;
 
-  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private loadingCtrl: LoadingController, private fireDB: AngularFirestore, private fireStorage: AngularFireStorage) {}
+  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private loadingCtrl: LoadingController, private fireDB: AngularFirestore, private fireStorage: AngularFireStorage, private calendar: Calendar, private alertCtrl: AlertController) {}
   ngOnInit(){
     this.startLoading();
     
@@ -86,6 +89,28 @@ export class HomePage implements OnInit, OnDestroy{
     this.mohmEventDoc.update(localMohmDoc);
     let attendanceToast = this.toastCtrl.create(this.config.createToastConfig(`${_text}`));
     attendanceToast.present();
+  }
+
+  addToCalendar(_mEvent: MohmEvent){
+    if(!this.calendar.hasReadWritePermission){
+      this.calendar.requestReadWritePermission().then((result) => {
+      }).catch((error) => {
+      });
+    }else{
+      this.calendar.createEventInteractively(_mEvent.$title, _mEvent.$location,_mEvent.$description,new Date(_mEvent.$date),new Date(_mEvent.$date)).then((result) => {
+        this.alertCtrl.create({
+          title: 'Results',
+          subTitle: JSON.stringify(result),
+          buttons: ['OK']
+        }).present();
+      }).catch((error)=> {
+        this.alertCtrl.create({
+          title: 'Error',
+          subTitle: JSON.stringify(error),
+          buttons: ['OK']
+        }).present();
+      });
+    }
   }
 
   startLoading(){
